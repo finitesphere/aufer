@@ -28,7 +28,7 @@ pip install -r requirements.txt
      ```
      python aufer.py <url> <file_type>
      ```
-     - **Optional: Enable Recursive Scraping**:
+   - **Optional: Enable Recursive Scraping**:
      ```
      python aufer.py <url> <file_type> --recursive
      ```
