@@ -56,4 +56,4 @@ python aufer.py https://en.wikipedia.org/wiki/Python_(programming_language) imag
 - [ ] Option to download torrents
 - [ ] Add more examples to README.md
 - [ ] Simplify the program by making it an executable
-- [ ] Add an optional GUI choice
+- [ ] Add an optional GUI program
