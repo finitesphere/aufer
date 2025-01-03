@@ -42,7 +42,7 @@ pip install -r requirements.txt
 ```
 python aufer.py https://en.wikipedia.org/wiki/Python_(programming_language) images
 ```
-### TO DO:
+## TO DO:
 - [X] Implement support for downloading different file types (images, videos, PDFs, etc.)
 - [X] Support recursive scraping to follow links to internal pages
 - [X] Add download progress bar
