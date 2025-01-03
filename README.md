@@ -53,3 +53,5 @@ python aufer.py https://en.wikipedia.org/wiki/Python_(programming_language) imag
 - [ ] Ability to download files from social media websites
 - [ ] Option to download torrents
 - [ ] Add more examples to README.md
+- [ ] Simplify the program by making it an executable
+- [ ] Add an optional GUI choice
