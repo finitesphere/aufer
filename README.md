@@ -37,7 +37,8 @@ pip install -r requirements.txt
       - `videos` – for videos: ".mp4", ".mkv", ".avi", ".mov", ".webm", ".flv", ".wmv", ".ogv"
       - `audio` – for audio: ".mp3", ".wav", ".ogg", ".flac", ".aac"
       - `document` – for PDFs: ".pdf", ".docx", ".txt", ".ppt", ".xls"
-5. Example
+
+5. Examples
 ```
 python aufer.py https://en.wikipedia.org/wiki/Python_(programming_language) images
 ```
