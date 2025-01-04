@@ -3,7 +3,7 @@ A Python CLI program to scrape websites and download specific file types like im
 
 ![](https://github.com/finitesphere/aufer/blob/main/logo.png)
 
-### Requirements:
+## Requirements:
 Make sure you have the following installed:
 - **Python 3**: https://www.python.org/downloads/
 
@@ -39,7 +39,6 @@ pip install -r requirements.txt
       - `videos` – for videos: ".mp4", ".mkv", ".avi", ".mov", ".webm", ".flv", ".wmv", ".ogv"
       - `audio` – for audio: ".mp3", ".wav", ".ogg", ".flac", ".aac"
       - `document` – for PDFs: ".pdf", ".docx", ".txt", ".ppt", ".xls"
-
 5. Examples
 ```
 python aufer.py https://en.wikipedia.org/wiki/Python_(programming_language) images
