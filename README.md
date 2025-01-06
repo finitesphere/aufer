@@ -1,7 +1,7 @@
 ## Aufer
 A Python CLI program to scrape websites and download specific file types like images, videos, PDFs, etc
 
-![](https://github.com/finitesphere/aufer/blob/main/logo6.png)
+![](https://github.com/finitesphere/aufer/blob/main/logo.png)
 
 ## Requirements:
 Make sure you have the following installed:
