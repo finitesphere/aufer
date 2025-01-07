@@ -43,13 +43,16 @@ pip install -r requirements.txt
 ```
 python aufer.py https://en.wikipedia.org/wiki/Python_(programming_language) images
 ```
+```
+python aufer.py https://archive.org/details/CC_1914_08_31_TheGoodforNothing videos
+```
 ## TO DO:
 - [X] Implement support for downloading different file types (images, videos, PDFs, etc.)
 - [X] Support recursive scraping to follow links to internal pages
 - [X] Add download progress bar
 - [X] Provide clear error messages for failed downloads
 - [X] Add instructions to the README.md
-- [ ] Verify video formats before downloading
+- [X] Verify video formats before downloading
 - [ ] Option to download encrypted files
 - [ ] Ability to download files from social media websites
 - [ ] Option to download torrents
