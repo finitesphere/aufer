@@ -60,3 +60,4 @@ python aufer.py https://archive.org/details/CC_1914_08_31_TheGoodforNothing vide
 - [ ] Simplify the program by making it an executable
 - [ ] Add an optional GUI program
 - [ ] Create a similar program but as a browser extension
+- [ ] Add web crawling
