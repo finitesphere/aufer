@@ -23,6 +23,16 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 MIN_DELAY = 1
 MAX_DELAY = 5
 
+def log_download(file_name, file_path, log_file="download_log.txt"):
+    """Log file download details to a text file."""
+    try:
+        file_size = os.path.getsize(file_path)
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        with open(log_file, "a") as log:
+            log.write(f"{file_name}, {file_size} bytes, {timestamp}\n")
+    except Exception as e:
+        print(f"{Fore.RED}Failed to log download for {file_name}: {e}{Fore.RESET}")
+
 def get_file_extension(url):
     """Extract file extension from a URL."""
     return os.path.splitext(urlparse(url).path)[1].lower()
@@ -51,6 +61,10 @@ def download_file(url, folder_name):
             with open(file_path, 'wb') as file:
                 for chunk in response.iter_content(chunk_size=1024):
                     file.write(chunk)
+
+        # Log the download
+        log_download(file_name, file_path)
+
         return file_name
     except Exception as e:
         print(f"{Fore.RED}Failed to download {url}: {e}{Fore.RESET}")
@@ -74,11 +88,9 @@ def scrape_files(url, file_type, folder_name, recursive=False):
         elif file_type == "videos":
             tags = soup.find_all("video")
             file_urls.extend([urljoin(url, tag["src"]) for tag in tags if "src" in tag.attrs])
-            # Check <source> tags within <video>
             for video_tag in tags:
                 source_tags = video_tag.find_all("source")
                 file_urls.extend([urljoin(url, source_tag["src"]) for source_tag in source_tags if "src" in source_tag.attrs])
-            # Check anchor tags for video links
             anchor_tags = soup.find_all("a", href=True)
             file_urls.extend([urljoin(url, tag["href"]) for tag in anchor_tags if any(tag["href"].endswith(ext) for ext in SUPPORTED_EXTENSIONS["video"])])
         elif file_type == "documents":
@@ -87,33 +99,6 @@ def scrape_files(url, file_type, folder_name, recursive=False):
         else:
             print(f"{Fore.RED}Unsupported file type: {file_type}{Fore.RESET}")
             return []
-
-        # Remove duplicates
-        file_urls = list(set(file_urls))
-
-        # Download the files
-        os.makedirs(folder_name, exist_ok=True)
-        downloaded_files = []
-        with tqdm(total=len(file_urls), desc="Downloading files", bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}', colour='green') as pbar:
-            for file_url in file_urls:
-                file_name = download_file(file_url, folder_name)
-                if file_name:
-                    downloaded_files.append(file_name)
-                pbar.update(1)
-                time.sleep(random.uniform(MIN_DELAY, MAX_DELAY))
-
-        # Recursive scraping for internal links
-        if recursive:
-            links = get_internal_links(url, soup)
-            for link in links:
-                print(f"Recursively scraping: {link}")
-                scrape_files(link, file_type, folder_name, recursive=False)
-
-        return downloaded_files
-    except Exception as e:
-        print(f"{Fore.RED}Error while processing {url}: {e}{Fore.RESET}")
-        return []
-
 
         # Remove duplicates
         file_urls = list(set(file_urls))
