@@ -59,5 +59,6 @@ python aufer.py https://archive.org/details/CC_1914_08_31_TheGoodforNothing vide
 - [ ] Add more examples to README.md
 - [ ] Simplify the program by making it an executable
 - [ ] Add an optional GUI program
+- [ ] Within the GUI program include options to manage downloads
 - [ ] Create a similar program but as a browser extension
 - [ ] Add web crawling
