@@ -57,6 +57,8 @@ python aufer.py https://archive.org/details/CC_1914_08_31_TheGoodforNothing vide
 - [ ] Ability to download files from social media websites
 - [ ] Option to download torrents
 - [ ] Add more examples to README.md
+- [ ] Thumbnail support in the GUI
+- [ ] Better log
 - [ ] Simplify the program by making it an executable
 - [ ] Add an optional GUI program
 - [ ] Within the GUI program include options to manage downloads
