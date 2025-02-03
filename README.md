@@ -65,3 +65,4 @@ python aufer.py https://archive.org/details/CC_1914_08_31_TheGoodforNothing vide
 - [ ] Create a similar program but as a browser extension
 - [ ] The web browser should include a "download all images(or audio, videos, documents) button
 - [ ] Add web crawling
+- [ ] More download settings in the GUI program
