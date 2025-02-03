@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import QThread, pyqtSignal
 
 SUPPORTED_EXTENSIONS = {
-    "video": [".mp4", ".mkv", ".avi", ".mov", ".webm"],
+    "video": [".mp4", ".mkv", ".avi", ".mov", ".webm", ".flv", ".wmv"],
     "image": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"],
     "audio": [".mp3", ".wav", ".ogg", ".flac", ".aac"],
     "document": [".pdf", ".docx", ".txt", ".ppt", ".xls"]
@@ -37,7 +37,8 @@ class DownloadThread(QThread):
 
     def scrape_files(self, url, file_type, folder, recursive):
         try:
-            response = requests.get(url, headers={'User-Agent': USER_AGENT})
+            headers = {"User-Agent": USER_AGENT, "Accept": "*/*", "Referer": url}
+            response = requests.get(url, headers=headers)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             file_urls = []
@@ -45,6 +46,10 @@ class DownloadThread(QThread):
             if file_type in SUPPORTED_EXTENSIONS:
                 file_urls = [urljoin(url, tag['href']) for tag in soup.find_all("a", href=True)
                              if any(tag['href'].endswith(ext) for ext in SUPPORTED_EXTENSIONS[file_type])]
+
+                if file_type == "video":
+                    file_urls += [urljoin(url, tag['src']) for tag in soup.find_all("source", src=True)]
+                    file_urls += [urljoin(url, tag['src']) for tag in soup.find_all("video", src=True)]
             
             os.makedirs(folder, exist_ok=True)
             downloaded_files = []
@@ -67,10 +72,11 @@ class DownloadThread(QThread):
             if os.path.exists(file_path):
                 return None
 
-            with requests.get(url, stream=True, headers={'User-Agent': USER_AGENT}) as response:
+            headers = {"User-Agent": USER_AGENT, "Accept": "*/*", "Referer": url}
+            with requests.get(url, stream=True, headers=headers) as response:
                 response.raise_for_status()
                 with open(file_path, 'wb') as file:
-                    for chunk in response.iter_content(chunk_size=1024):
+                    for chunk in response.iter_content(chunk_size=8192):  
                         file.write(chunk)
             return file_name
         except Exception as e:
