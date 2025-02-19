@@ -15,10 +15,13 @@ from PyQt6.QtCore import QThread, pyqtSignal
 SUPPORTED_EXTENSIONS = {
     "video": [".mp4", ".mkv", ".avi", ".mov", ".webm", ".flv", ".wmv"],
     "image": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"],
-    "audio": [".mp3", ".wav", ".ogg", ".flac", ".aac"],
+    "audio": [".mp3", ".wav", ".ogg", ".flac", ".aac", ".oga"],
     "document": [".pdf", ".docx", ".txt", ".ppt", ".xls"]
 }
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124"
+
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+MIN_DELAY = 1
+MAX_DELAY = 5
 
 class DownloadThread(QThread):
     progress_signal = pyqtSignal(int)
@@ -43,27 +46,54 @@ class DownloadThread(QThread):
             soup = BeautifulSoup(response.text, 'html.parser')
             file_urls = []
 
-            if file_type in SUPPORTED_EXTENSIONS:
-                file_urls = [urljoin(url, tag['href']) for tag in soup.find_all("a", href=True)
-                             if any(tag['href'].endswith(ext) for ext in SUPPORTED_EXTENSIONS[file_type])]
+            if file_type == "image":
+                file_urls = [urljoin(url, tag["src"]) for tag in soup.find_all("img") if "src" in tag.attrs]
+            elif file_type == "video":
+                file_urls = [urljoin(url, tag["src"]) for tag in soup.find_all("video") if "src" in tag.attrs]
+                file_urls += [urljoin(url, tag["src"]) for tag in soup.find_all("source") if "src" in tag.attrs]
+                file_urls += [urljoin(url, tag["href"]) for tag in soup.find_all("a", href=True)
+                              if any(tag["href"].endswith(ext) for ext in SUPPORTED_EXTENSIONS["video"])]
+            elif file_type == "audio":
+                file_urls = [urljoin(url, tag["src"]) for tag in soup.find_all("audio") if "src" in tag.attrs]
+                file_urls += [urljoin(url, tag["src"]) for tag in soup.find_all("source") if "src" in tag.attrs]
+                file_urls += [urljoin(url, tag["href"]) for tag in soup.find_all("a", href=True)
+                              if any(tag["href"].endswith(ext) for ext in SUPPORTED_EXTENSIONS["audio"])]
+            elif file_type == "document":
+                file_urls = [urljoin(url, tag["href"]) for tag in soup.find_all("a", href=True)
+                             if any(tag["href"].endswith(ext) for ext in SUPPORTED_EXTENSIONS["document"])]
+            else:
+                self.log_signal.emit(f"Unsupported file type: {file_type}")
+                return []
 
-                if file_type == "video":
-                    file_urls += [urljoin(url, tag['src']) for tag in soup.find_all("source", src=True)]
-                    file_urls += [urljoin(url, tag['src']) for tag in soup.find_all("video", src=True)]
-            
+            file_urls = list(set(file_urls))
             os.makedirs(folder, exist_ok=True)
             downloaded_files = []
+
             for i, file_url in enumerate(file_urls):
                 file_name = self.download_file(file_url, folder)
                 if file_name:
                     downloaded_files.append(file_name)
                 self.progress_signal.emit(int((i + 1) / len(file_urls) * 100))
-                time.sleep(random.uniform(1, 3))
+                time.sleep(random.uniform(MIN_DELAY, MAX_DELAY))
             
+            if recursive:
+                links = self.get_internal_links(url, soup)
+                for link in links:
+                    self.log_signal.emit(f"Recursively scraping: {link}")
+                    downloaded_files += self.scrape_files(link, file_type, folder, recursive=False)
+
             return downloaded_files
         except Exception as e:
             self.log_signal.emit(f"Error: {str(e)}")
             return []
+
+    def get_internal_links(self, base_url, soup):
+        links = []
+        for anchor in soup.find_all("a", href=True):
+            link = urljoin(base_url, anchor["href"])
+            if urlparse(base_url).netloc == urlparse(link).netloc:
+                links.append(link)
+        return list(set(links))
 
     def download_file(self, url, folder):
         try:
@@ -76,7 +106,7 @@ class DownloadThread(QThread):
             with requests.get(url, stream=True, headers=headers) as response:
                 response.raise_for_status()
                 with open(file_path, 'wb') as file:
-                    for chunk in response.iter_content(chunk_size=8192):  
+                    for chunk in response.iter_content(chunk_size=8192):
                         file.write(chunk)
             return file_name
         except Exception as e:
